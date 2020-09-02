@@ -1,0 +1,74 @@
+from random import randint
+
+users = {}
+balance = 0
+
+
+def main_menu():
+    print('1. Create an account\n2. Log into account\n0. Exit')
+    main_menu_choice = int(input())
+    return main_menu_choice
+
+
+def log_in():
+    global balance
+    print('Enter your card number:')
+    user_login = input()
+    print('Enter your PIN:')
+    user_pin = input()
+
+    if len(user_login) != 16 or len(user_pin) != 4 or user_login not in users or user_pin != users[user_login][0]:
+        print('Wrong card number or PIN!\n')
+        return False
+    else:
+        balance = users[user_login][1]
+        return True
+
+
+def create_card():
+    global users
+    card_number = '400000' + str(randint(1000000000, 9999999999))
+    card_pin = str(randint(1000, 9999))
+    users.update({card_number: [card_pin, 0]})
+    print('Your card has been created')
+    print(f'Your card number:\n{card_number}')
+    print(f'Your card PIN:\n{card_pin}\n')
+
+
+def check_balance():
+    print(f'Balance: {balance}\n')
+
+
+def account_menu():
+    print('You have successfully logged in!\n')
+    while True:
+        print('1. Balance\n2. Log out\n0. Exit')
+
+        account_menu_choice = int(input())
+
+        if account_menu_choice == 1:
+            check_balance()
+        elif account_menu_choice == 2:
+            break
+        elif account_menu_choice == 0:
+            print('Bye!')
+            quit()
+        break
+
+
+def main():
+    while True:
+        main_menu_choice = main_menu()
+        if main_menu_choice == 1:
+            create_card()
+        elif main_menu_choice == 2:
+            if log_in():
+                account_menu()
+            else:
+                continue
+        elif main_menu_choice == 0:
+            print('Bye!')
+            quit()
+
+
+main()
