@@ -27,7 +27,21 @@ def log_in():
 
 def create_card():
     global users
-    card_number = '400000' + str(randint(1000000000, 9999999999))
+    iin = '400000'
+    acc_id = str(randint(100000000, 999999999))
+    number = iin + acc_id
+    checksum = list(number)
+    len_ = len(checksum)
+    for x in range(len_):
+        checksum[x] = int(checksum[x])
+    for i in range(0, len_, 2):
+        checksum[i] = checksum[i] * 2
+        if int(checksum[i]) > 9:
+            checksum[i] = checksum[i] - 9
+    checksum = sum(checksum)
+    checksum = (10 - checksum) % 10
+    card_number = iin + acc_id + str(checksum)
+
     card_pin = str(randint(1000, 9999))
     users.update({card_number: [card_pin, 0]})
     print('Your card has been created')
