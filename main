@@ -1,4 +1,16 @@
 from random import randint
+import sqlite3
+
+with sqlite3.connect('card.s3db') as conn:
+    cur = conn.cursor()
+
+    cur.execute('''CREATE TABLE IF NOT EXISTS card (
+                id INTEGER,
+                number TEXT,
+                pin TEXT,
+                balance INTEGER DEFAULT 0
+                );''')
+    conn.commit()
 
 users = {}
 balance = 0
@@ -16,12 +28,16 @@ def log_in():
     user_login = input()
     print('Enter your PIN:')
     user_pin = input()
-
-    if len(user_login) != 16 or len(user_pin) != 4 or user_login not in users or user_pin != users[user_login][0]:
+    with sqlite3.connect('card.s3db') as conn:
+        cur = conn.cursor()
+        cur.execute(f'SELECT number, pin, balance FROM card WHERE number = {user_login}')
+        result = cur.fetchone()
+        print(result)
+    if len(user_login) != 16 or len(user_pin) != 4 or result is None or user_pin != result[1]:
         print('Wrong card number or PIN!\n')
         return False
     else:
-        balance = users[user_login][1]
+        balance = result[2]
         return True
 
 
@@ -43,6 +59,12 @@ def create_card():
     card_number = iin + acc_id + str(checksum)
 
     card_pin = str(randint(1000, 9999))
+    with sqlite3.connect('card.s3db') as conn:
+        cur = conn.cursor()
+
+        cur.execute(f"INSERT INTO card ('number', 'pin') VALUES ({card_number}, {card_pin});")
+        conn.commit()
+
     users.update({card_number: [card_pin, 0]})
     print('Your card has been created')
     print(f'Your card number:\n{card_number}')
